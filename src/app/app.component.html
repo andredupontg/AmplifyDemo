@@ -1,26 +1,10 @@
-<div class="form-body">
-  <form
-    autocomplete="off"
-    [formGroup]="createForm"
-    (ngSubmit)="onCreate(createForm.value)"
+<amplify-authenticator>
+  <ng-template
+    amplifySlot="authenticated"
+    let-user="user"
+    let-signOut="signOut"
   >
-    <div>
-      <label>Name: </label>
-      <input type="text" formControlName="name" autocomplete="off" />
-    </div>
-    <div>
-      <label>Description: </label>
-      <input type="text" formControlName="description" autocomplete="off" />
-    </div>
-    <div>
-      <label>City: </label>
-      <input type="text" formControlName="city" autocomplete="off" />
-    </div>
-    <button type="submit">Submit</button>
-  </form>
-  <div *ngFor="let restaurant of restaurants">
-    <div>{{ restaurant.city }}</div>
-    <div>{{ restaurant.name }}</div>
-    <div>{{ restaurant.description }}</div>
-  </div>
-</div>
+    <app-restaurants></app-restaurants>
+    <button (click)="signOut()">Sign Out</button>
+  </ng-template>
+</amplify-authenticator>

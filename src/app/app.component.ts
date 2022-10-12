@@ -1,29 +1,21 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import { ZenObservable } from 'zen-observable-ts';
 import { APIService, Restaurant } from './API.service';
-import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit, OnDestroy {
-  title = 'amplify-angular-app';
-  public createForm: FormGroup;
+export class AppComponent implements OnInit, OnDestroy{
+  title = 'demo';
 
-  /* declare restaurants variable */
-  public restaurants: Array<Restaurant> = [];
-
-  constructor(private api: APIService, private fb: FormBuilder) {
-    this.createForm = this.fb.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
-      city: ['', Validators.required]
-    });
+  constructor(private api: APIService) {
   }
 
-  private subscription: Subscription | null = null;
+  public restaurants: Array<Restaurant> = [];
+
+  private subscription: ZenObservable.Subscription | null = null;
 
   async ngOnInit() {
     this.api.ListRestaurants().then(event => {
@@ -31,11 +23,11 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     /* subscribe to new restaurants being created */
-    this.subscription = <Subscription>(
-      this.api.OnCreateRestaurantListener.subscribe((event: any) => {
+    this.subscription = this.api.OnCreateRestaurantListener.subscribe(
+      (event: any) => {
         const newRestaurant = event.value.data.onCreateRestaurant;
         this.restaurants = [newRestaurant, ...this.restaurants];
-      })
+      }
     );
   }
 
@@ -44,17 +36,5 @@ export class AppComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe();
     }
     this.subscription = null;
-  }
-
-  public onCreate(restaurant: Restaurant) {
-    this.api
-      .CreateRestaurant(restaurant)
-      .then((event) => {
-        console.log('item created!');
-        this.createForm.reset();
-      })
-      .catch((e) => {
-        console.log('error creating restaurant...', e);
-      });
   }
 }
